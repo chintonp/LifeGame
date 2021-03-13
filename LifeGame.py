@@ -11,12 +11,16 @@ LIFE_COLS = 30
 OFFSET_X = 5
 OFFSET_Y = 5
 GEN_INTERVAL = 1000 #miliseconds
+FADE_STEPS = 3
+ALIVE_COLOR = "#0000FF"
+DEAD_COLOR = "#FFFFFF"
 
 class LifeGame:
 
     def __init__(self, height = HEIGHT, width = WIDTH, title = TITLE, 
                 life_rows = LIFE_ROWS, life_cols = LIFE_COLS, offset_x = OFFSET_X, 
-                offset_y = OFFSET_Y, gen_interval = GEN_INTERVAL):
+                offset_y = OFFSET_Y, gen_interval = GEN_INTERVAL, fade_steps = FADE_STEPS,
+                alive_color = ALIVE_COLOR, dead_color = DEAD_COLOR):
         
         self.height = height
         self.width = width
@@ -26,6 +30,9 @@ class LifeGame:
         self.offset_x = offset_x
         self.offset_y = offset_y
         self.gen_interval = gen_interval
+        self.fade_steps = fade_steps
+        self.alive_color = ALIVE_COLOR
+        self.dead_color = DEAD_COLOR
 
 
     def run(self):
@@ -37,7 +44,7 @@ class LifeGame:
         self.btn.bind("<Button-1>", self.clickBtn)
         self.btn.pack()
         self.isRunning = True
-        self.canvas = tk.Canvas(root, height= self.height + 2 * self.offset_y, width= self.width + 2 * self.offset_x, bg='white')
+        self.canvas = tk.Canvas(root, height= self.height + 2 * self.offset_y, width= self.width + 2 * self.offset_x, bg=self.dead_color)
         cell_square_x = self.width / self.life_cols
         cell_square_y = self.height / self.life_rows
 
@@ -46,11 +53,11 @@ class LifeGame:
         for cy in range(self.life_rows):
             row = []
             for cx in range(self.life_cols):
-                cell = c.CellLG(self.canvas, self.canvas.create_oval(cx * cell_square_x + self.offset_x, 
+                cell = c.CellLG(self, self.canvas.create_oval(cx * cell_square_x + self.offset_x, 
                                                 cy * cell_square_y + self.offset_y, 
                                                 (cx + 1) * cell_square_x - 1 + self.offset_x, 
                                                 (cy + 1) * cell_square_y -1 + self.offset_y, 
-                                                fill = 'blue', outline=''))
+                                                fill = self.alive_color, outline=''))
                 row.append(cell)
             self.lifeMatrix.append(row)
 
