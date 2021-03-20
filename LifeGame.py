@@ -1,117 +1,108 @@
 import tkinter as tk
-from tkinter.constants import TRUE
 import CellLG as c
+import LifeGameUI as lgui;
 
-
-HEIGHT = 600
-WIDTH = 800
-TITLE = "Game of Life"
-LIFE_ROWS = 30
-LIFE_COLS = 30
-OFFSET_X = 5
-OFFSET_Y = 5
-GEN_INTERVAL = 1000 #miliseconds
-FADE_STEPS = 3
-ALIVE_COLOR = "#0000FF"
-DEAD_COLOR = "#FFFFFF"
 
 class LifeGame:
 
-    def __init__(self, height = HEIGHT, width = WIDTH, title = TITLE, 
-                life_rows = LIFE_ROWS, life_cols = LIFE_COLS, offset_x = OFFSET_X, 
-                offset_y = OFFSET_Y, gen_interval = GEN_INTERVAL, fade_steps = FADE_STEPS,
-                alive_color = ALIVE_COLOR, dead_color = DEAD_COLOR):
+    def __init__(self, height = lgui.HEIGHT, width = lgui.WIDTH, title = lgui.TITLE, 
+                life_rows = lgui.LIFE_ROWS, life_cols = lgui.LIFE_COLS, offset_x = lgui.OFFSET_X, 
+                offset_y = lgui.OFFSET_Y, gen_interval = lgui.GEN_INTERVAL, fade_steps = lgui.FADE_STEPS,
+                alive_color = lgui.ALIVE_COLOR, dead_color = lgui.DEAD_COLOR):
         
-        self.height = height
-        self.width = width
-        self.title = title
-        self.life_rows = life_rows
-        self.life_cols = life_cols
-        self.offset_x = offset_x
-        self.offset_y = offset_y
-        self.gen_interval = gen_interval
-        self.fade_steps = fade_steps
-        self.alive_color = ALIVE_COLOR
-        self.dead_color = DEAD_COLOR
-
-
-    def run(self):
-        root = tk.Tk()
-        root.title(self.title)
-        self.genLabel = tk.Label(text="Generation: 0")
-        self.genLabel.pack()
-        self.btn = tk.Button(text="Stop")
-        self.btn.bind("<Button-1>", self.clickBtn)
-        self.btn.pack()
-        self.isRunning = True
-        self.canvas = tk.Canvas(root, height= self.height + 2 * self.offset_y, width= self.width + 2 * self.offset_x, bg=self.dead_color)
-        cell_square_x = self.width / self.life_cols
-        cell_square_y = self.height / self.life_rows
+        self.rows = life_rows
+        self.cols = life_cols
 
         self.lifeMatrix = []
 
-        for cy in range(self.life_rows):
+        for y in range(self.cols):
             row = []
-            for cx in range(self.life_cols):
-                cell = c.CellLG(self, self.canvas.create_oval(cx * cell_square_x + self.offset_x, 
-                                                cy * cell_square_y + self.offset_y, 
-                                                (cx + 1) * cell_square_x - 1 + self.offset_x, 
-                                                (cy + 1) * cell_square_y -1 + self.offset_y, 
-                                                fill = self.alive_color, outline=''))
-                row.append(cell)
+            for x in range(self.rows):
+                row.append(c.CellLG(x, y))
             self.lifeMatrix.append(row)
 
-        self.genN = 0
-        
-        self.canvas.pack()
-        self.canvas.after(self.gen_interval, self.nextGen)
-        root.mainloop()
+        self.lgu = lgui.LifeGameUI(self, height, width, title, self.rows, self.cols, offset_x, 
+                offset_y, gen_interval, fade_steps, alive_color, dead_color)
+
+                    
+    def run(self):
+        self.lgu.run()
+
+    
+    def isCellAlive(self, x, y):
+        return self.lifeMatrix[y][x].isCellAlive()
 
 
-    def nextGen(self):
-        self.genN += 1
-        self.genLabel.config(text = 'Generation: ' + str(self.genN))
-        #print("Generation: ", self.genN)
+    def neighborCount(self):
         neighborLifeMatrix = []
-        for cy in range(self.life_rows):
+        for cy in range(self.rows):
             row = []
-            for cx in range(self.life_cols):
+            for cx in range(self.cols):
                 x_init = cx - 1
                 x_end = cx + 1
                 y_init = cy - 1
                 y_end = cy + 1
                 if cx == 0:
                     x_init = 0
-                elif cx == self.life_cols - 1:
+                elif cx == self.cols - 1:
                     x_end = cx
                 if   cy == 0:
                     y_init = 0
-                elif cy == self.life_rows - 1:
+                elif cy == self.rows - 1:
                     y_end = cy 
-                
-                #print ("x_init: " + str(x_init) + " - x_end: " + str(x_end) + " - y_init: " + str(y_init) + " - y_end: " + str(y_end))
                 number_alive = 0
                 for y in range (y_init, y_end + 1):
                     for x in range (x_init, x_end + 1):
-                        #print ("x: ", x, " - y: ", y)
-                        if self.lifeMatrix[y][x].isAlive == c.ALIVE:
-                            number_alive += 1        
+                        if self.lifeMatrix[y][x].isCellAlive() :
+                            number_alive += 1 
+                        #print ("x: ", x, " - y: ", y, " - number_alive: ", number_alive)
                 row.append(number_alive)
             neighborLifeMatrix.append(row)
+        return neighborLifeMatrix
 
-        for cy in range(self.life_rows):
-            for cx in range(self.life_rows):
-                self.lifeMatrix[cy][cx].lifeCalc(neighborLifeMatrix[cy][cx])     
+
+    def calcNextGen(self):
+        neighborMatrix = self.neighborCount()
+        for y in range(self.rows):
+            for x in range(self.cols):
+                self.lifeMatrix[y][x].calcNextGen(neighborMatrix[y][x])
+
+
+    # def nextGen(self):
+    #     self.genN += 1
+    #     self.genLabel.config(text = 'Generation: ' + str(self.genN))
+    #     #print("Generation: ", self.genN)
+    #     neighborLifeMatrix = []
+    #     for cy in range(self.life_rows):
+    #         row = []
+    #         for cx in range(self.life_cols):
+    #             x_init = cx - 1
+    #             x_end = cx + 1
+    #             y_init = cy - 1
+    #             y_end = cy + 1
+    #             if cx == 0:
+    #                 x_init = 0
+    #             elif cx == self.life_cols - 1:
+    #                 x_end = cx
+    #             if   cy == 0:
+    #                 y_init = 0
+    #             elif cy == self.life_rows - 1:
+    #                 y_end = cy 
+                
+    #             #print ("x_init: " + str(x_init) + " - x_end: " + str(x_end) + " - y_init: " + str(y_init) + " - y_end: " + str(y_end))
+    #             number_alive = 0
+    #             for y in range (y_init, y_end + 1):
+    #                 for x in range (x_init, x_end + 1):
+    #                     #print ("x: ", x, " - y: ", y)
+    #                     if self.lifeMatrix[y][x].isAlive == c.ALIVE:
+    #                         number_alive += 1        
+    #             row.append(number_alive)
+    #         neighborLifeMatrix.append(row)
+
+    #     for cy in range(self.life_rows):
+    #         for cx in range(self.life_rows):
+    #             self.lifeMatrix[cy][cx].lifeCalc(neighborLifeMatrix[cy][cx])     
         
-        if self.isRunning:
-            self.canvas.after(self.gen_interval, self.nextGen)  
+    #     if self.isRunning:
+    #         self.canvas.after(self.gen_interval, self.nextGen)  
 
-
-    def clickBtn(self, event):
-        if self.isRunning:
-            self.btn.configure(text="Start")
-            self.isRunning = False
-        else:
-            self.btn.configure(text="Stop")
-            self.isRunning = True
-            self.nextGen()
