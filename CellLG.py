@@ -10,6 +10,8 @@ class CellLG:
         self.id = (x, y)
         self.isBorn() 
         self.changed = False
+        self.genBirth = 0
+        self.ages = []
         # self.lg = lg
         # self.cell_gr = cell_gr
         # self.fade_step_number = 0
@@ -26,26 +28,27 @@ class CellLG:
         else:
             return False
 
-    def calcNextGen(self, number_alive):
+    def calcNextGen(self, number_alive, genN):
         if self.isAlive == ALIVE:
             if number_alive > 3:
-                self.toDead()
+                self.toDead(genN)
         else:
             if number_alive >= 2 and number_alive <= 3:
-                self.toLife()    
+                self.toLife(genN)    
         
 
-    def toDead(self):
+    def toDead(self, genN):
         self.isAlive = DEAD
         self.changed = True
-    #    self.fade(self.lg.alive_color, self.lg.dead_color, 0)
-        #print ("Aqui")
+        age = genN - self.genBirth
+        self.ages.append(age)
 
 
-    def toLife(self):
+    def toLife(self, genN):
         self.isAlive = ALIVE
         self.changed = True
-    #    self.fade(self.lg.dead_color, self.lg.alive_color, 0)
+        self.genBirth = genN
+
 
     def verifyChange(self):
         r = self.changed

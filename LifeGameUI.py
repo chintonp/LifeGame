@@ -13,13 +13,14 @@ GEN_INTERVAL = 1000 #miliseconds
 FADE_STEPS = 3
 ALIVE_COLOR = "#0000FF"
 DEAD_COLOR = "#FFFFFF"
+NOCANVAS = False
 
 class LifeGameUI:
 
     def __init__(self, lifeGame, height = HEIGHT, width = WIDTH, title = TITLE, 
                 life_rows = LIFE_ROWS, life_cols = LIFE_COLS, offset_x = OFFSET_X, 
                 offset_y = OFFSET_Y, gen_interval = GEN_INTERVAL, fade_steps = FADE_STEPS,
-                alive_color = ALIVE_COLOR, dead_color = DEAD_COLOR):
+                alive_color = ALIVE_COLOR, dead_color = DEAD_COLOR, no_canvas = NOCANVAS):
 
         self.lg = lifeGame
         self.height = height
@@ -33,6 +34,8 @@ class LifeGameUI:
         self.fade_steps = fade_steps
         self.alive_color = ALIVE_COLOR
         self.dead_color = DEAD_COLOR
+        self.no_canvas = no_canvas
+
 
     def run(self):
         root = tk.Tk()
@@ -43,25 +46,25 @@ class LifeGameUI:
         self.btn.bind("<Button-1>", self.clickBtn)
         self.btn.pack()
         self.isRunning = True
-        self.canvas = tk.Canvas(root, height= self.height + 2 * self.offset_y, width= self.width + 2 * self.offset_x, bg=self.dead_color)
-        cell_square_x = self.width / self.life_cols
-        cell_square_y = self.height / self.life_rows
-
         self.lifeMatrixUI = []
-        color = lambda x, y, lg: self.alive_color if lg.isCellAlive(x, y) else self.dead_color
-
-        for cy in range(self.life_rows):
-            row = []
-            for cx in range(self.life_cols):
-                #cell = self.createCellUI(self.lg.lifeMatrix[cy][cy], self.canvas, cx, cy, cell_square_x, cell_square_y, self.offset_x, self.offset_y, color(cx, cy, self.lg))
-                cell = self.createCellUI(cx, cy, cell_square_x, cell_square_y, color(cx, cy, self.lg))
-                row.append(cell)
-            self.lifeMatrixUI.append(row)
-
         self.genN = 0
+        if (self.no_canvas == False):
+            self.canvas = tk.Canvas(root, height= self.height + 2 * self.offset_y, width= self.width + 2 * self.offset_x, bg=self.dead_color)
+            cell_square_x = self.width / self.life_cols
+            cell_square_y = self.height / self.life_rows
+
+            color = lambda x, y, lg: self.alive_color if lg.isCellAlive(x, y) else self.dead_color
+
+            for cy in range(self.life_rows):
+                row = []
+                for cx in range(self.life_cols):
+                    cell = self.createCellUI(cx, cy, cell_square_x, cell_square_y, color(cx, cy, self.lg))
+                    row.append(cell)
+                self.lifeMatrixUI.append(row)
+         
+            self.canvas.pack()
         
-        self.canvas.pack()
-        self.canvas.after(self.gen_interval, self.nextGen)
+        self.genLabel.after(self.gen_interval, self.nextGen)
         root.mainloop()
 
 
@@ -75,13 +78,14 @@ class LifeGameUI:
 
         self.lg.calcNextGen()
 
-        for y in range(self.life_rows):
-            for x in range(self.life_cols):
-                self.lifeMatrixUI[y][x].updateCell(self.alive_color, self.dead_color)
-        
+        if (self.no_canvas == False):
+            for y in range(self.life_rows):
+                for x in range(self.life_cols):
+                    self.lifeMatrixUI[y][x].updateCell(self.alive_color, self.dead_color)
+                    #print ("x: ", x,  "- y: ", y, " - ages: ", self.lg.lifeMatrix[y][x].ages)
 
         if self.isRunning:
-            self.canvas.after(self.gen_interval, self.nextGen)  
+            self.genLabel.after(self.gen_interval, self.nextGen)  
 
 
     def clickBtn(self, event):

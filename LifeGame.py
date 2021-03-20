@@ -8,7 +8,7 @@ class LifeGame:
     def __init__(self, height = lgui.HEIGHT, width = lgui.WIDTH, title = lgui.TITLE, 
                 life_rows = lgui.LIFE_ROWS, life_cols = lgui.LIFE_COLS, offset_x = lgui.OFFSET_X, 
                 offset_y = lgui.OFFSET_Y, gen_interval = lgui.GEN_INTERVAL, fade_steps = lgui.FADE_STEPS,
-                alive_color = lgui.ALIVE_COLOR, dead_color = lgui.DEAD_COLOR):
+                alive_color = lgui.ALIVE_COLOR, dead_color = lgui.DEAD_COLOR, no_canvas = lgui.NOCANVAS):
         
         self.rows = life_rows
         self.cols = life_cols
@@ -22,7 +22,7 @@ class LifeGame:
             self.lifeMatrix.append(row)
 
         self.lgu = lgui.LifeGameUI(self, height, width, title, self.rows, self.cols, offset_x, 
-                offset_y, gen_interval, fade_steps, alive_color, dead_color)
+                offset_y, gen_interval, fade_steps, alive_color, dead_color, no_canvas)
 
                     
     def run(self):
@@ -65,4 +65,4 @@ class LifeGame:
         neighborMatrix = self.neighborCount()
         for y in range(self.rows):
             for x in range(self.cols):
-                self.lifeMatrix[y][x].calcNextGen(neighborMatrix[y][x])
+                self.lifeMatrix[y][x].calcNextGen(neighborMatrix[y][x], self.lgu.genN)
