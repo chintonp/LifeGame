@@ -22,11 +22,16 @@ class CellLGUI:
         #                                     fill = self.alive_color, outline='')))
 
     def updateCell(self, alive_color, dead_color):
+        origin_color = alive_color
+        dest_color = dead_color
         if self.cell.verifyChange():
             if self.cell.isCellAlive():
-                self.fade(dead_color, alive_color, 0)
+                origin_color = dead_color
+                dest_color = alive_color
+            if self.lgui.fade_steps == 0:
+                self.lgui.canvas.itemconfig(self.cellgui, fill = dest_color)
             else:
-                self.fade(alive_color, dead_color, 0)
+                self.fade(origin_color, dest_color, 0)
 
 
     def fade(self, origin_color, dest_color, step):    

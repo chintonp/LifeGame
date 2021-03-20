@@ -1,4 +1,3 @@
-import LifeGame as lg
 import tkinter as tk
 import CellLGUI as clgui
 
