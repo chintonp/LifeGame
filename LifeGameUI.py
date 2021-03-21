@@ -10,17 +10,17 @@ LIFE_COLS = 30
 OFFSET_X = 5
 OFFSET_Y = 5
 GEN_INTERVAL = 1000 #miliseconds
-FADE_STEPS = 3
+FADE_STEPS = 0
 ALIVE_COLOR = "#0000FF"
 DEAD_COLOR = "#FFFFFF"
-NOCANVAS = False
+NO_CANVAS = False
 
 class LifeGameUI:
 
     def __init__(self, lifeGame, height = HEIGHT, width = WIDTH, title = TITLE, 
                 life_rows = LIFE_ROWS, life_cols = LIFE_COLS, offset_x = OFFSET_X, 
                 offset_y = OFFSET_Y, gen_interval = GEN_INTERVAL, fade_steps = FADE_STEPS,
-                alive_color = ALIVE_COLOR, dead_color = DEAD_COLOR, no_canvas = NOCANVAS):
+                alive_color = ALIVE_COLOR, dead_color = DEAD_COLOR, no_canvas = NO_CANVAS):
 
         self.lg = lifeGame
         self.height = height
@@ -32,19 +32,24 @@ class LifeGameUI:
         self.offset_y = offset_y
         self.gen_interval = gen_interval
         self.fade_steps = fade_steps
-        self.alive_color = ALIVE_COLOR
-        self.dead_color = DEAD_COLOR
+        self.alive_color = alive_color
+        self.dead_color = dead_color
         self.no_canvas = no_canvas
 
 
     def run(self):
         root = tk.Tk()
         root.title(self.title)
-        self.genLabel = tk.Label(text="Generation: 0")
-        self.genLabel.pack()
-        self.btn = tk.Button(text="Stop")
+        frame = tk.Frame(root)
+        self.genLabel = tk.Label(frame, text="Generation: 0")
+        self.genLabel.pack(pady = 5)
+        self.btn = tk.Button(frame, text="Stop")
         self.btn.bind("<Button-1>", self.clickBtn)
-        self.btn.pack()
+        self.btn.pack(side = tk.LEFT)
+        self.statBtn = tk.Button(frame, text="Stats", state=tk.DISABLED)
+        self.statBtn.bind("<Button-1>", self.clickStatBtn)
+        self.statBtn.pack(side = tk.RIGHT)
+        frame.pack(pady = 10)
         self.isRunning = True
         self.lifeMatrixUI = []
         self.genN = 0
@@ -91,8 +96,15 @@ class LifeGameUI:
     def clickBtn(self, event):
         if self.isRunning:
             self.btn.configure(text="Start")
+            self.statBtn['state'] = tk.NORMAL
             self.isRunning = False
         else:
             self.btn.configure(text="Stop")
+            self.statBtn['state'] = tk.DISABLED
             self.isRunning = True
             self.nextGen()
+
+    def clickStatBtn(self, event):
+        if self.statBtn['state'] == tk.DISABLED:
+            return
+        print("Stat!")

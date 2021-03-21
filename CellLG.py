@@ -12,11 +12,6 @@ class CellLG:
         self.changed = False
         self.genBirth = 0
         self.ages = []
-        # self.lg = lg
-        # self.cell_gr = cell_gr
-        # self.fade_step_number = 0
-        # if self.isAlive == DEAD:
-        #     self.lg.canvas.itemconfig(self.cell_gr, fill = lg.dead_color)
 
 
     def isBorn(self):

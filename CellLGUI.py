@@ -49,16 +49,14 @@ class CellLGUI:
             factor = next_step / self.lgui.fade_steps
             #print ("Factor: ", factor)
             red = int(red_origin + (red_dest - red_origin) * factor)
-            #red = int((red_origin + red_destinarion) * factor)
             #print("Red: ", red)
             green = int(green_origin + (green_dest - green_origin) * factor)
-            #green = int((green_origin + green_destinarion) * factor)
             #print("Green: ", green)
             blue = int(blue_origin + (blue_dest - blue_origin) * factor)
-            #blue = int((blue_origin + blue_destinarion) * factor)
             #print ("Blue: ", blue)
-            fade_color = "#" + str(hex(red))[2:] + str(hex(green))[2:] + str(hex(blue))[2:]
-            #print ("Red: ", str(hex(red)), " - [2:]: ", str(hex(red))[2:] )
+            #fade_color = "#" + str(hex(red))[2:] + str(hex(green))[2:] + str(hex(blue))[2:]
+            fade_color = "#%02X%02X%02X" % (red, green, blue)
+            #print ("Green: ", str(hex(green)), " - [2:]: ", str(hex(green))[2:] )
             #print ("Fade color = ", fade_color)
             self.lgui.canvas.itemconfig(self.cellgui, fill = fade_color)
             #print ("Next interval: ", int(self.lg.gen_interval / self.lg.fade_steps))
