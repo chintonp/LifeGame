@@ -5,7 +5,7 @@ import pandas as pd
 
 NO_GUI = False
 MAX_GENERATION = 100000
-VERSION = "0.2.4"
+VERSION = "0.2.4.1"
 
 class LifeGame:
 
@@ -23,9 +23,9 @@ class LifeGame:
         title = title + " - (" + str(life_rows) + " x " + str(life_cols) + ")"
         self.lifeMatrix = []
 
-        for y in range(self.cols):
+        for y in range(self.rows):
             row = []
-            for x in range(self.rows):
+            for x in range(self.cols):
                 row.append(c.CellLG(x, y))
             self.lifeMatrix.append(row)
 
@@ -59,6 +59,7 @@ class LifeGame:
 
     
     def isCellAlive(self, x, y):
+        #print ("x - ", x, " : ", " y - ", y)
         return self.lifeMatrix[y][x].isCellAlive()
 
 
@@ -103,7 +104,7 @@ class LifeGame:
 
     def stats(self):
         columns = ['id', 'avg', 'stdev']
-        columns_size = columns.len()
+        columns_size = len(columns)
         df = pd.DataFrame(columns = columns)    
         for y in range(self.rows):
             for x in range(self.cols):
