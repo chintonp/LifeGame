@@ -28,14 +28,17 @@ class CellLG:
         else:
             return False
 
-    def calcNextGen(self, number_alive, genN):
+    def calcNextGen(self, number_alive, genN, no_gui):
         if self.isAlive == ALIVE:
             if number_alive > 3:
                 self.toDead(genN)
         else:
             if number_alive >= 2 and number_alive <= 3:
                 self.toLife(genN)
-        return self.changed    
+        changed = self.changed    
+        if no_gui:
+            self.changed = False
+        return changed
         
 
     def toDead(self, genN):

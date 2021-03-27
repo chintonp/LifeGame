@@ -3,18 +3,24 @@ import CellLG as c
 import LifeGameUI as lgui
 import pandas as pd
 
-COLUMN_STAT = 3
+NO_GUI = False
+MAX_GENERATION = 100000
+VERSION = "0.2.4"
 
 class LifeGame:
 
     def __init__(self, height = lgui.HEIGHT, width = lgui.WIDTH, title = lgui.TITLE, 
                 life_rows = lgui.LIFE_ROWS, life_cols = lgui.LIFE_COLS, offset_x = lgui.OFFSET_X, 
                 offset_y = lgui.OFFSET_Y, gen_interval = lgui.GEN_INTERVAL, fade_steps = lgui.FADE_STEPS,
-                alive_color = lgui.ALIVE_COLOR, dead_color = lgui.DEAD_COLOR, no_canvas = lgui.NO_CANVAS):
+                alive_color = lgui.ALIVE_COLOR, dead_color = lgui.DEAD_COLOR, no_canvas = lgui.NO_CANVAS,
+                no_gui = NO_GUI, max_gen = MAX_GENERATION):
         
         self.rows = life_rows
         self.cols = life_cols
-
+        self.no_gui = no_gui
+        self.max_gen = max_gen
+        self.genN = 0
+        title = title + " - (" + str(life_rows) + " x " + str(life_cols) + ")"
         self.lifeMatrix = []
 
         for y in range(self.cols):
@@ -23,12 +29,33 @@ class LifeGame:
                 row.append(c.CellLG(x, y))
             self.lifeMatrix.append(row)
 
-        self.lgu = lgui.LifeGameUI(self, height, width, title, self.rows, self.cols, offset_x, 
+        if no_gui:
+            self.initNoGui(title)
+        else:
+            self.lgu = lgui.LifeGameUI(self, height, width, title, self.rows, self.cols, offset_x, 
                 offset_y, gen_interval, fade_steps, alive_color, dead_color, no_canvas)
 
                     
+    def initNoGui(self, title):
+        print("\n***** Game of Life *****")
+        print("Version: ", VERSION)
+        print(title)
+        print("")
+
+    
     def run(self):
-        self.lgu.run()
+        if (self.no_gui):
+            self.runGame()
+        else:
+            self.lgu.run()
+
+    def runGame(self):
+        changed = True
+        while (changed == True and self.genN < self.max_gen):
+            print("Generation: ", self.genN, end = '\r')
+            changed = self.calcNextGen()
+        print('\n')
+        self.stats()
 
     
     def isCellAlive(self, x, y):
@@ -64,21 +91,27 @@ class LifeGame:
 
 
     def calcNextGen(self):
+        self.genN += 1
         changed = False
         neighborMatrix = self.neighborCount()
         for y in range(self.rows):
             for x in range(self.cols):
-                if self.lifeMatrix[y][x].calcNextGen(neighborMatrix[y][x], self.lgu.genN):
+                if self.lifeMatrix[y][x].calcNextGen(neighborMatrix[y][x], self.genN, self.no_gui):
                     changed = True
         return changed
 
 
     def stats(self):
-        df = pd.DataFrame(columns = ['id', 'avg', 'stdev'])    
+        columns = ['id', 'avg', 'stdev']
+        columns_size = columns.len()
+        df = pd.DataFrame(columns = columns)    
         for y in range(self.rows):
             for x in range(self.cols):
+                print(".", end='', flush = True)
                 #pd.append(self.lifeMatrix[y][x].stats())
                 df = df.append(self.lifeMatrix[y][x].stats(), ignore_index = True)
-        df['avg'] = df.iloc[: , COLUMN_STAT:].mean(axis = 1)
-        df['stdev'] = df.iloc[: , COLUMN_STAT:].std(ddof = 0, axis = 1)
+            print(y, end = '', flush = True)
+        print("!", flush = True)
+        df['avg'] = df.iloc[: , columns_size:].mean(axis = 1)
+        df['stdev'] = df.iloc[: , columns_size:].std(ddof = 0, axis = 1)
         print (df)

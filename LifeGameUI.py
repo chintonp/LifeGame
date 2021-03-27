@@ -52,7 +52,7 @@ class LifeGameUI:
         frame.pack(pady = 10)
         self.isRunning = True
         self.lifeMatrixUI = []
-        self.genN = 0
+        self.lg.max_gen -= 1
         if (self.no_canvas == False):
             self.canvas = tk.Canvas(root, height= self.height + 2 * self.offset_y, width= self.width + 2 * self.offset_x, bg=self.dead_color)
             cell_square_x = self.width / self.life_cols
@@ -78,18 +78,19 @@ class LifeGameUI:
 
 
     def nextGen(self):
-        self.genN += 1
-        self.genLabel.config(text = 'Generation: ' + str(self.genN))
-
-        if (self.lg.calcNextGen()):
-            if (self.no_canvas == False):
-                for y in range(self.life_rows):
-                    for x in range(self.life_cols):
-                        self.lifeMatrixUI[y][x].updateCell(self.alive_color, self.dead_color)
+        if (self.lg.genN < self.lg.max_gen):
+            if (self.lg.calcNextGen()):
+                if (self.no_canvas == False):
+                    for y in range(self.life_rows):
+                        for x in range(self.life_cols):
+                            self.lifeMatrixUI[y][x].updateCell(self.alive_color, self.dead_color)
+            else:
+                print("no modifications")
+                self.stopRunning()
+        
+            self.genLabel.config(text = 'Generation: ' + str(self.lg.genN))
         else:
-            print("no modifications")
             self.stopRunning()
-
         if self.isRunning:
             self.genLabel.after(self.gen_interval, self.nextGen)  
 
