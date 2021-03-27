@@ -1,4 +1,6 @@
 import random
+import pandas as pd
+import statistics as st
 
 ALIVE = 1
 DEAD = 0   
@@ -11,11 +13,14 @@ class CellLG:
         self.isBorn() 
         self.changed = False
         self.genBirth = 0
-        self.ages = []
+        self.ages = { }
+        self.genNumber = 0
 
 
     def isBorn(self):
         self.isAlive = random.choice(STATE)
+        if self.isAlive:
+            self.toLife(0)
 
     def isCellAlive(self):
         if self.isAlive == ALIVE:
@@ -29,14 +34,16 @@ class CellLG:
                 self.toDead(genN)
         else:
             if number_alive >= 2 and number_alive <= 3:
-                self.toLife(genN)    
+                self.toLife(genN)
+        return self.changed    
         
 
     def toDead(self, genN):
         self.isAlive = DEAD
         self.changed = True
         age = genN - self.genBirth
-        self.ages.append(age)
+        self.ages["Gen. " +  str(self.genNumber)] = age
+        self.genNumber += 1
 
 
     def toLife(self, genN):
@@ -49,3 +56,8 @@ class CellLG:
         r = self.changed
         self.changed = False
         return r
+
+
+    def stats(self):
+       series = pd.Series({ "id": self.id})
+       return (series.append(pd.Series(self.ages)))

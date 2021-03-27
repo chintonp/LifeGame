@@ -1,7 +1,9 @@
 import tkinter as tk
 import CellLG as c
-import LifeGameUI as lgui;
+import LifeGameUI as lgui
+import pandas as pd
 
+COLUMN_STAT = 3
 
 class LifeGame:
 
@@ -62,7 +64,21 @@ class LifeGame:
 
 
     def calcNextGen(self):
+        changed = False
         neighborMatrix = self.neighborCount()
         for y in range(self.rows):
             for x in range(self.cols):
-                self.lifeMatrix[y][x].calcNextGen(neighborMatrix[y][x], self.lgu.genN)
+                if self.lifeMatrix[y][x].calcNextGen(neighborMatrix[y][x], self.lgu.genN):
+                    changed = True
+        return changed
+
+
+    def stats(self):
+        df = pd.DataFrame(columns = ['id', 'avg', 'stdev'])    
+        for y in range(self.rows):
+            for x in range(self.cols):
+                #pd.append(self.lifeMatrix[y][x].stats())
+                df = df.append(self.lifeMatrix[y][x].stats(), ignore_index = True)
+        df['avg'] = df.iloc[: , COLUMN_STAT:].mean(axis = 1)
+        df['stdev'] = df.iloc[: , COLUMN_STAT:].std(ddof = 0, axis = 1)
+        print (df)

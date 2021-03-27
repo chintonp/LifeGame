@@ -81,13 +81,14 @@ class LifeGameUI:
         self.genN += 1
         self.genLabel.config(text = 'Generation: ' + str(self.genN))
 
-        self.lg.calcNextGen()
-
-        if (self.no_canvas == False):
-            for y in range(self.life_rows):
-                for x in range(self.life_cols):
-                    self.lifeMatrixUI[y][x].updateCell(self.alive_color, self.dead_color)
-                    #print ("x: ", x,  "- y: ", y, " - ages: ", self.lg.lifeMatrix[y][x].ages)
+        if (self.lg.calcNextGen()):
+            if (self.no_canvas == False):
+                for y in range(self.life_rows):
+                    for x in range(self.life_cols):
+                        self.lifeMatrixUI[y][x].updateCell(self.alive_color, self.dead_color)
+        else:
+            print("no modifications")
+            self.stopRunning()
 
         if self.isRunning:
             self.genLabel.after(self.gen_interval, self.nextGen)  
@@ -95,16 +96,20 @@ class LifeGameUI:
 
     def clickBtn(self, event):
         if self.isRunning:
-            self.btn.configure(text="Start")
-            self.statBtn['state'] = tk.NORMAL
-            self.isRunning = False
+            self.stopRunning()
         else:
             self.btn.configure(text="Stop")
             self.statBtn['state'] = tk.DISABLED
             self.isRunning = True
             self.nextGen()
 
+    
+    def stopRunning(self):
+        self.btn.configure(text="Start")
+        self.statBtn['state'] = tk.NORMAL
+        self.isRunning = False
+    
     def clickStatBtn(self, event):
         if self.statBtn['state'] == tk.DISABLED:
             return
-        print("Stat!")
+        self.lg.stats()
