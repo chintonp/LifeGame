@@ -13,7 +13,7 @@ class CellLG:
         self.isBorn() 
         self.changed = False
         self.genBirth = 0
-        self.ages = { }
+        self.info = { "id": self.id }
         self.genNumber = 0
 
 
@@ -45,7 +45,7 @@ class CellLG:
         self.isAlive = DEAD
         self.changed = True
         age = genN - self.genBirth
-        self.ages["Gen. " +  str(self.genNumber)] = age
+        self.info["Gen." +  str(self.genNumber)] = age
         self.genNumber += 1
 
 
@@ -61,6 +61,6 @@ class CellLG:
         return r
 
 
-    def stats(self):
-       series = pd.Series({ "id": self.id})
-       return (series.append(pd.Series(self.ages)))
+    # def stats(self):
+    #    series = pd.Series({ "id": self.id})
+    #    return (series.append(pd.Series(self.info)))

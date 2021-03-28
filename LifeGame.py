@@ -2,10 +2,11 @@ import tkinter as tk
 import CellLG as c
 import LifeGameUI as lgui
 import pandas as pd
+import numpy as np
 
 NO_GUI = False
 MAX_GENERATION = 100000
-VERSION = "0.2.4.1"
+VERSION = "0.2.4.2"
 
 class LifeGame:
 
@@ -103,16 +104,56 @@ class LifeGame:
 
 
     def stats(self):
-        columns = ['id', 'avg', 'stdev']
-        columns_size = len(columns)
-        df = pd.DataFrame(columns = columns)    
+        #columns = ['avg', 'stdev', 'numGen', 'maxAge']
+        columns = [ 'numGen' ]
+        gen_info_start = len(columns) + 1
+        #df = pd.DataFrame(columns = columns)    
+        data = []
         for y in range(self.rows):
             for x in range(self.cols):
-                print(".", end='', flush = True)
+                #print(".", end='', flush = True)
                 #pd.append(self.lifeMatrix[y][x].stats())
-                df = df.append(self.lifeMatrix[y][x].stats(), ignore_index = True)
-            print(y, end = '', flush = True)
-        print("!", flush = True)
-        df['avg'] = df.iloc[: , columns_size:].mean(axis = 1)
-        df['stdev'] = df.iloc[: , columns_size:].std(ddof = 0, axis = 1)
-        print (df)
+                #df = df.append(self.lifeMatrix[y][x].info, ignore_index = True)
+                data.append(self.lifeMatrix[y][x].info)
+            #print(y, end = '', flush = True)
+        #print("!\n", flush = True)
+        
+        i = 0
+        d = {}
+        for entry in data:
+            d[i] = entry
+            i += 1
+        df= pd.DataFrame.from_dict(d, "index")
+        
+        i = 1
+        for col in columns:
+            #print (col, flush=True)
+            df.insert(i, col, 0)
+            i += 1
+
+        #df['avg'] = df.iloc[: , gen_info_start:].mean(axis = 1)
+        #df['stdev'] = df.iloc[: , gen_info_start:].std(ddof = 0, axis = 1)
+        df['numGen'] = df.iloc[: , gen_info_start:].count(axis = 1)
+        #df['maxAge'] = df.iloc[: , gen_info_start:].max(axis = 1)
+        
+        #print(df)
+
+        values = df.iloc[: , gen_info_start:].values
+        #print (values)
+
+        report = "***** Game of Life Report *****\n"
+        report = report + "- Number of iterations: " + str(self.genN)
+        report = report + "\n- Oldest cell: " + str (np.nanmax(values))
+        report = report + "\n- Averade age: " + str (np.nanmean(values))
+        report = report + "\n- Standard deviation age: " + str(np.nanstd(values))
+        report = report + "\n- Max number of generations: " + str(df['numGen'].max())
+        report = report + "\n- Min number of genereations: " + str(df['numGen'].min())
+        report = report + "\n- Mean number of generations: " + str(df['numGen'].mean())
+        report = report + "\n- Standar deviation number of generations: " + str(df['numGen'].std(ddof = 0))
+        
+        #print (df.iloc[: , gen_info_start:])
+
+        if self.no_gui:
+            print (report)
+
+        return report

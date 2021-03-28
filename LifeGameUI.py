@@ -38,9 +38,9 @@ class LifeGameUI:
 
 
     def run(self):
-        root = tk.Tk()
-        root.title(self.title)
-        frame = tk.Frame(root)
+        self.rootTk = tk.Tk()
+        self.rootTk.title(self.title)
+        frame = tk.Frame(self.rootTk)
         self.genLabel = tk.Label(frame, text="Generation: 0")
         self.genLabel.pack(pady = 5)
         self.btn = tk.Button(frame, text="Stop")
@@ -49,12 +49,12 @@ class LifeGameUI:
         self.statBtn = tk.Button(frame, text="Stats", state=tk.DISABLED)
         self.statBtn.bind("<Button-1>", self.clickStatBtn)
         self.statBtn.pack(side = tk.RIGHT)
-        frame.pack(pady = 10)
+        frame.pack(pady = 10, padx = 75)
         self.isRunning = True
         self.lifeMatrixUI = []
         self.lg.max_gen -= 1
         if (self.no_canvas == False):
-            self.canvas = tk.Canvas(root, height= self.height + 2 * self.offset_y, width= self.width + 2 * self.offset_x, bg=self.dead_color)
+            self.canvas = tk.Canvas(self.rootTk, height= self.height + 2 * self.offset_y, width= self.width + 2 * self.offset_x, bg=self.dead_color)
             cell_square_x = self.width / self.life_cols
             cell_square_y = self.height / self.life_rows
 
@@ -70,7 +70,7 @@ class LifeGameUI:
             self.canvas.pack()
         
         self.genLabel.after(self.gen_interval, self.nextGen)
-        root.mainloop()
+        self.rootTk.mainloop()
 
 
     def createCellUI(self, col, row, cell_row_len, cell_col_len, color):
@@ -113,4 +113,12 @@ class LifeGameUI:
     def clickStatBtn(self, event):
         if self.statBtn['state'] == tk.DISABLED:
             return
-        self.lg.stats()
+        
+        report = self.lg.stats()
+
+        newWindow = tk.Toplevel(self.rootTk)
+        newWindow.title("Stats Report")
+        label = tk.Label(newWindow, justify=tk.LEFT, padx = 10, pady = 10, font = "Verdana 10", text = report )
+        label.pack()
+
+
