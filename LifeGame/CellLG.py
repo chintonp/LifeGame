@@ -28,7 +28,7 @@ class CellLG:
         else:
             return False
 
-    def calcNextGen(self, number_alive, genN, no_gui):
+    def calcNextGen(self, number_alive, genN, no_canvas):
         if self.isAlive == ALIVE:
             if number_alive > 3:
                 self.toDead(genN)
@@ -36,7 +36,7 @@ class CellLG:
             if number_alive >= 2 and number_alive <= 3:
                 self.toLife(genN)
         changed = self.changed    
-        if no_gui:
+        if no_canvas:
             self.changed = False
         return changed
         
@@ -59,6 +59,17 @@ class CellLG:
         r = self.changed
         self.changed = False
         return r
+
+
+    def endGame(self, genN):
+        if self.isAlive == ALIVE:
+            self.toDead(genN)
+
+
+    # def calculateAge(self, genN):
+    #     age = genN - self.genBirth
+    #     self.info["Gen." +  str(self.genNumber)] = age
+    #     self.genNumber += 1
 
 
     # def stats(self):

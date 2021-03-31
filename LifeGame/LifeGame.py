@@ -1,12 +1,13 @@
 import tkinter as tk
-import CellLG as c
-import LifeGameUI as lgui
+import LifeGame.CellLG as c
+import LifeGame.LifeGameUI as lgui
 import pandas as pd
 import numpy as np
 
 NO_GUI = False
 MAX_GENERATION = 100000
-VERSION = "0.2.4.2"
+VERSION = "0.2.4.3"
+SILENT = False
 
 class LifeGame:
 
@@ -14,12 +15,15 @@ class LifeGame:
                 life_rows = lgui.LIFE_ROWS, life_cols = lgui.LIFE_COLS, offset_x = lgui.OFFSET_X, 
                 offset_y = lgui.OFFSET_Y, gen_interval = lgui.GEN_INTERVAL, fade_steps = lgui.FADE_STEPS,
                 alive_color = lgui.ALIVE_COLOR, dead_color = lgui.DEAD_COLOR, no_canvas = lgui.NO_CANVAS,
-                no_gui = NO_GUI, max_gen = MAX_GENERATION):
+                no_gui = NO_GUI, max_gen = MAX_GENERATION, silent = SILENT):
         
         self.rows = life_rows
         self.cols = life_cols
         self.no_gui = no_gui
+        if no_gui:
+            no_canvas = True
         self.max_gen = max_gen
+        self.silent = silent
         self.genN = 0
         title = title + " - (" + str(life_rows) + " x " + str(life_cols) + ")"
         self.lifeMatrix = []
@@ -30,7 +34,7 @@ class LifeGame:
                 row.append(c.CellLG(x, y))
             self.lifeMatrix.append(row)
 
-        if no_gui:
+        if no_gui and not self.silent:
             self.initNoGui(title)
         else:
             self.lgu = lgui.LifeGameUI(self, height, width, title, self.rows, self.cols, offset_x, 
@@ -46,17 +50,22 @@ class LifeGame:
     
     def run(self):
         if (self.no_gui):
-            self.runGame()
+            return self.runGame()
         else:
             self.lgu.run()
 
     def runGame(self):
         changed = True
         while (changed == True and self.genN < self.max_gen):
-            print("Generation: ", self.genN, end = '\r')
+            if not self.silent:
+                print("Generation: ", self.genN, end = '\r')
             changed = self.calcNextGen()
-        print('\n')
-        self.stats()
+        if not self.silent:
+            print('\n')
+        dresults = self.stats()
+        if self.no_gui and not self.silent:
+            print(self.generateReport(dresults))
+        return dresults
 
     
     def isCellAlive(self, x, y):
@@ -92,18 +101,23 @@ class LifeGame:
         return neighborLifeMatrix
 
 
-    def calcNextGen(self):
+    def calcNextGen(self, no_canvas = True):
         self.genN += 1
         changed = False
         neighborMatrix = self.neighborCount()
         for y in range(self.rows):
             for x in range(self.cols):
-                if self.lifeMatrix[y][x].calcNextGen(neighborMatrix[y][x], self.genN, self.no_gui):
+                if self.lifeMatrix[y][x].calcNextGen(neighborMatrix[y][x], self.genN, no_canvas):
                     changed = True
         return changed
 
 
     def stats(self):
+        for y in range(self.rows):
+            for x in range(self.cols):
+                self.lifeMatrix[y][x].endGame(self.genN)
+
+
         #columns = ['avg', 'stdev', 'numGen', 'maxAge']
         columns = [ 'numGen' ]
         gen_info_start = len(columns) + 1
@@ -141,19 +155,44 @@ class LifeGame:
         values = df.iloc[: , gen_info_start:].values
         #print (values)
 
-        report = "***** Game of Life Report *****\n"
-        report = report + "- Number of iterations: " + str(self.genN)
-        report = report + "\n- Oldest cell: " + str (np.nanmax(values))
-        report = report + "\n- Averade age: " + str (np.nanmean(values))
-        report = report + "\n- Standard deviation age: " + str(np.nanstd(values))
-        report = report + "\n- Max number of generations: " + str(df['numGen'].max())
-        report = report + "\n- Min number of genereations: " + str(df['numGen'].min())
-        report = report + "\n- Mean number of generations: " + str(df['numGen'].mean())
-        report = report + "\n- Standar deviation number of generations: " + str(df['numGen'].std(ddof = 0))
+        dresults = {}
+
+        dresults ['num_it'] = self.genN
+        dresults ['oldest'] = np.nanmax(values)
+        dresults ['ave_age'] = np.nanmean(values)
+        dresults ['std_age'] = np.nanstd(values)
+        dresults ['max_gen'] = df['numGen'].max()
+        dresults ['min_gen'] = df['numGen'].min()
+        dresults ['ave_gen'] = df['numGen'].mean()
+        dresults ['std_gen'] = df['numGen'].std(ddof = 0)
+
+        # report = "***** Game of Life Report *****\n"
+        # report = report + "- Number of iterations: " + str(self.genN)
+        # report = report + "\n- Oldest cell: " + str (np.nanmax(values))
+        # report = report + "\n- Averade age: " + str (np.nanmean(values))
+        # report = report + "\n- Standard deviation age: " + str(np.nanstd(values))
+        # report = report + "\n- Max number of generations: " + str(df['numGen'].max())
+        # report = report + "\n- Min number of genereations: " + str(df['numGen'].min())
+        # report = report + "\n- Mean number of generations: " + str(df['numGen'].mean())
+        # report = report + "\n- Standar deviation number of generations: " + str(df['numGen'].std(ddof = 0))
         
         #print (df.iloc[: , gen_info_start:])
 
-        if self.no_gui:
-            print (report)
+        # if self.no_gui:
+        #     print (report)
 
+        return dresults
+
+    def generateReport(self, dresults):
+        report = "***** Game of Life Report *****\n"
+        report = report + "- Number of iterations: " + str(dresults ['num_it'])
+        report = report + "\n- Oldest cell: " + str (dresults ['oldest'])
+        report = report + "\n- Averade age: " + str (dresults ['ave_age'])
+        report = report + "\n- Standard deviation age: " + str(dresults ['std_age'])
+        report = report + "\n- Max number of generations: " + str(dresults ['max_gen'])
+        report = report + "\n- Min number of genereations: " + str(dresults ['min_gen'])
+        report = report + "\n- Mean number of generations: " + str(dresults ['ave_gen'])
+        report = report + "\n- Standar deviation number of generations: " + str(dresults ['std_gen'])
         return report
+
+       

@@ -1,5 +1,5 @@
 import tkinter as tk
-import CellLGUI as clgui
+import LifeGame.CellLGUI as clgui
 
 
 HEIGHT = 600
@@ -35,6 +35,7 @@ class LifeGameUI:
         self.alive_color = alive_color
         self.dead_color = dead_color
         self.no_canvas = no_canvas
+        self.end_game = False
 
 
     def run(self):
@@ -79,14 +80,14 @@ class LifeGameUI:
 
     def nextGen(self):
         if (self.lg.genN < self.lg.max_gen):
-            if (self.lg.calcNextGen()):
+            if self.lg.calcNextGen(self.no_canvas):
                 if (self.no_canvas == False):
                     for y in range(self.life_rows):
                         for x in range(self.life_cols):
                             self.lifeMatrixUI[y][x].updateCell(self.alive_color, self.dead_color)
             else:
-                print("no modifications")
                 self.stopRunning()
+                self.end_game = True
         
             self.genLabel.config(text = 'Generation: ' + str(self.lg.genN))
         else:
@@ -98,7 +99,7 @@ class LifeGameUI:
     def clickBtn(self, event):
         if self.isRunning:
             self.stopRunning()
-        else:
+        elif not self.end_game:
             self.btn.configure(text="Stop")
             self.statBtn['state'] = tk.DISABLED
             self.isRunning = True
@@ -114,7 +115,7 @@ class LifeGameUI:
         if self.statBtn['state'] == tk.DISABLED:
             return
         
-        report = self.lg.stats()
+        report = self.lg.generateReport(self.lg.stats())
 
         newWindow = tk.Toplevel(self.rootTk)
         newWindow.title("Stats Report")
