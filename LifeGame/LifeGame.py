@@ -6,7 +6,7 @@ import numpy as np
 
 NO_GUI = False
 MAX_GENERATION = 100000
-VERSION = "0.2.4.3"
+VERSION = "0.2.4.4"
 SILENT = False
 
 class LifeGame:
@@ -192,7 +192,7 @@ class LifeGame:
         report = report + "\n- Max number of generations: " + str(dresults ['max_gen'])
         report = report + "\n- Min number of genereations: " + str(dresults ['min_gen'])
         report = report + "\n- Mean number of generations: " + str(dresults ['ave_gen'])
-        report = report + "\n- Standar deviation number of generations: " + str(dresults ['std_gen'])
+        report = report + "\n- Standard deviation number of generations: " + str(dresults ['std_gen'])
         return report
 
        
