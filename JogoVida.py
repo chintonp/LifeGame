@@ -4,5 +4,19 @@ import LifeGame.LifeGameSim as lgs
 #jogo = lg.LifeGame(life_rows = 5, life_cols = 5, gen_interval = 200, no_canvas=True)
 #jogo.run()
 
-sim = lgs.LifeGameSim(life_cols = 5, life_rows = 5, max_gen = 1000)
-sim.run()
+rows = 10
+cols = 10
+max_gen = 1000
+tolerance = 0.05
+
+sim = lgs.LifeGameSim(life_cols = cols, life_rows = rows, max_gen = max_gen, tolerance = tolerance)
+dresults = sim.run()
+
+print("***** Game of Life *****")
+print("Rows: ", rows, " - Cols: ", cols)
+print("Max number of generations: ", max_gen)
+print("Tolerance: ", tolerance)
+print("\nResults:")
+print("- Number of iterations", 2 * dresults['n_iter'])
+print("- Averade oldest: ", dresults['mean_oldest'], " +/- ", tolerance * 100, "%")
+print("- Averade std dev: ", dresults['stdev_oldest'], " +/- ", tolerance * 100, "%")
