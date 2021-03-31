@@ -3,6 +3,7 @@ import LifeGame.LifeGameUI as lgui
 import numpy as np
 
 TOLERANCE = 0.1
+NUMBER_ITER_INIT = 1000
 
 class LifeGameSim:
 
@@ -12,9 +13,9 @@ class LifeGameSim:
         self.max_gen = max_gen
         self.tolerance = tolerance
 
-    def run(self):
+    def run(self, niter_init = NUMBER_ITER_INIT):
         running = True
-        ni = 1000
+        ni = niter_init
         while running:
             print ("Runnig sample 1 for ni = ", ni)
             dres1 = self.runSample(ni)
@@ -37,6 +38,7 @@ class LifeGameSim:
         #amaxgen = []
         for i in range(ni):
             #print ("Iteration: ", i)
+            print (".", end='', flush=True)
             lgame = lg.LifeGame(life_cols = self.life_cols, life_rows = self.life_rows, max_gen = self.max_gen, no_gui = True, silent = True)
             dresults = lgame.run()
             #report = lgame.generateReport(dresults)
@@ -45,7 +47,7 @@ class LifeGameSim:
             #amaxgen.append(dresults['max_gen'])
             #print (report)
             #print ("*****\n\n")
-
+        print("!", flush = True)
         #npaoldest = np.array(aoldest)
         dres = {}
         dres['mean_oldest'] = np.nanmean(aoldest)
