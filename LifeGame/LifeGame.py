@@ -1,6 +1,6 @@
 import tkinter as tk
-import LifeGame.CellLG as c
-import LifeGame.LifeGameUI as lgui
+import CellLG as c
+import LifeGameUI as lgui
 import pandas as pd
 import numpy as np
 

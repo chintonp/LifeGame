@@ -1,5 +1,5 @@
-import LifeGame.LifeGame as lg
-import LifeGame.LifeGameUI as lgui
+import LifeGame as lg
+import LifeGameUI as lgui
 import numpy as np
 
 TOLERANCE = 0.1
@@ -41,12 +41,9 @@ class LifeGameSim:
             print (".", end='', flush=True)
             lgame = lg.LifeGame(life_cols = self.life_cols, life_rows = self.life_rows, max_gen = self.max_gen, no_gui = True, silent = True)
             dresults = lgame.run()
-            #report = lgame.generateReport(dresults)
             aoldest[i] = dresults['oldest']
             #aaveage.append(dresults['ave_age'])
             #amaxgen.append(dresults['max_gen'])
-            #print (report)
-            #print ("*****\n\n")
         print("!", flush = True)
         #npaoldest = np.array(aoldest)
         dres = {}

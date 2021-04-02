@@ -1,5 +1,5 @@
 import tkinter as tk
-import LifeGame.CellLG
+import CellLG
 #import LifeGameUI
 
 class CellLGUI:

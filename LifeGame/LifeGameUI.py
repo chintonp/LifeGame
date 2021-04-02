@@ -1,5 +1,5 @@
 import tkinter as tk
-import LifeGame.CellLGUI as clgui
+import CellLGUI as clgui
 
 
 HEIGHT = 600
