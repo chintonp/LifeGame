@@ -6,7 +6,7 @@ import numpy as np
 
 NO_GUI = False
 MAX_GENERATION = 100000
-VERSION = "0.3.0.1"
+VERSION = "0.3.0.2"
 SILENT = False
 
 class LifeGame:
